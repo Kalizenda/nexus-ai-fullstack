@@ -28,6 +28,7 @@ app.use(compression());
 app.use(cors({ origin: process.env.APP_ORIGIN ? process.env.APP_ORIGIN.split(',').map(s => s.trim()) : false, methods: ['GET','POST','PATCH'], allowedHeaders: ['Content-Type','Authorization'] }));
 app.use(express.json({ limit: '20kb' }));
 app.use(express.urlencoded({ extended: false, limit: '20kb' }));
+app.use('/media', express.static(path.join(__dirname, '..', 'media'), { index: false, maxAge: '1h' }));
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 12, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'Too many authentication attempts. Please wait and try again.' } });
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/admin', adminRoutes);

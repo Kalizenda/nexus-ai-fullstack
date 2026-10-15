@@ -55,6 +55,8 @@ In-app admin notification records are stored in MongoDB for registrations and su
 
 The full website frontend is `public.html`; Express serves it at `/`. The same project folder contains the API, MongoDB models, and administrator dashboard. You do not need to run a separate frontend server.
 
+The public robot promo video is stored at `media/nexus_ai_robotic_trading_promo.mp4` and appears in the homepage Robot showcase. Public media files in `media/` are served under `/media/`.
+
 Your full-page robot frontend insertion point is:
 
 `robot/robot-frontend.html`
